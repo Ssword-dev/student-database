@@ -5,7 +5,7 @@
  * discriminators. each instance has a code (for switch/case) and a name (for debugging / JSON
  * output).
  */
-class TokenType
+class TokenType implements JsonSerializable
 {
     public int $code;
     public string $name;
@@ -14,6 +14,10 @@ class TokenType
     {
         $this->code = $code;
         $this->name = $name;
+    }
+
+    public function jsonSerialize(): mixed{
+        return $this->name;
     }
 
     // tag token types.
@@ -58,15 +62,25 @@ class TokenType
     }
 }
 
-class Token
+class Token implements JsonSerializable
 {
     public TokenType $type;
     public string $value;
+    public ?string $raw;
 
-    public function __construct(TokenType $type, string $value)
+    public function __construct(TokenType $type, string $value, ?string $raw = null)
     {
         $this->type = $type;
         $this->value = $value;
+        $this->raw = $raw;
+    }
+
+    public function jsonSerialize(): mixed {
+        return [
+            "type"=> $this->type,
+            "value"=> $this->value,
+            "raw" => $this->raw
+        ];
     }
 }
 
@@ -222,7 +236,7 @@ class Lexer
                 $state->addToken(new Token(TokenType::$Text, $text));
                 continue;
             }
-            // Move to the next character if no token was matched.
+
             continue;
         }
 
@@ -230,10 +244,11 @@ class Lexer
     }
 }
 
-$html = "<div><span>Hello world!</span></div>";
+$html = "<div><span>Hello world!</span></div><br />";
 TokenType::initialize();
 $lexer = new Lexer();
 
 $tokens = $lexer->tokenize($html);
 
-var_dump($tokens);
+header("Content-Type: application/json");
+echo json_encode($tokens);
