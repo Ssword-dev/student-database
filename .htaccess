@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# serve static assets
+RewriteRule ^static/ - [L]
+
+# serve api routes
+RewriteRule ^api/ - [L]
+
+# all other request is treated as front-end request
+# and is handed to custom router.
+RewriteRule ^ index.php [QSA,L]

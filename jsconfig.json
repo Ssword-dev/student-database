@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		"target": "ES2020",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"checkJs": false,
+		"jsx": "react",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": ".",
+		"lib": ["ES2020", "DOM"]
+	},
+	"include": [
+		"static/js/**/*.js"
+	],
+	"exclude": [
+		"node_modules",
+		"vendor",
+		"build",
+		"dist",
+		"**/*.php",
+		"**/*.sql",
+		".git"
+	]
+}

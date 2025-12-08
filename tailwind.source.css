@@ -1,0 +1,72 @@
+@source "./routes/**/*.php";
+@import "tailwindcss";
+
+body {
+  width: 100vw;
+  min-height: 100vh;
+  color: var(--pallete-color-text);
+  background: var(--pallete-color-background);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @apply bg-background;
+}
+
+/* anti scrollbar measures. */
+
+#app {
+  height: 100vh;
+  width: 100%;
+}
+
+@theme inline {
+  --color-background: var(--pallete-color-background);
+  --color-surface: var(--pallete-color-surface);
+  --color-muted: var(--pallete-color-muted);
+  --color-text: var(--pallete-color-text);
+  --color-text-muted: var(--pallete-color-text-muted);
+  --color-accent: var(--pallete-color-accent);
+  --color-accent-strong: var(--pallete-color-accent-strong);
+  --color-border: var(--pallete-color-border);
+  --color-border-muted: var(--pallete-color-border-muted);
+  --color-primary: var(--pallete-color-primary);
+  --color-secondary: var(--pallete-color-secondary);
+  --color-danger: var(--pallete-color-danger);
+  --color-warning: var(--pallete-color-warning);
+  --color-success: var(--pallete-color-success);
+  --color-info: var(--pallete-color-info);
+  --color-shadow: var(--pallete-color-shadow);
+}
+
+@utility no-scrollbar {
+    & {
+      scrollbar-width: none;
+    }
+  
+    &::-webkit-scrollbar {
+      display: none;
+    }
+}
+
+
+html, body {
+  @apply no-scrollbar;
+}
