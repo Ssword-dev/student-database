@@ -6,6 +6,7 @@
   "packageManager": "yarn@4.6.0",
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.17",
+    "autocannon": "^8.0.0",
     "tailwindcss": "^4.1.17"
   }
 }

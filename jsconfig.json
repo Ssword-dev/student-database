@@ -11,7 +11,7 @@
 		"lib": ["ES2020", "DOM"]
 	},
 	"include": [
-		"static/js/**/*.js"
+		"src/static/js/**/*.js"
 	],
 	"exclude": [
 		"node_modules",

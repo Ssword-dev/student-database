@@ -1,0 +1,30 @@
+{
+    "name": "ssword-dev/student-database",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ssword-dev",
+            "email": "ssword.dev@gmail.com"
+        }
+    ],
+    "scripts": {
+        "test": "pest"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src",
+            "Tests\\": "tests",
+            "EdgeFramework\\": "libs/EdgeFramework"
+        }
+    },
+    "require-dev": {
+        "pestphp/pest": "^4.1"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

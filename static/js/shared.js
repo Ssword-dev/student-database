@@ -1,4 +1,4 @@
-import { default as getESMJQuery } from "./esm-jquery";
+import { default as getESMJQuery } from "./esm-jquery.js";
 
 const metadataElementTagnameList = [
     'link',
