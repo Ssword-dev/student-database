@@ -8,4 +8,4 @@ RewriteRule ^api/ - [L]
 
 # all other request is treated as front-end request
 # and is handed to custom router.
-RewriteRule ^ index.php [QSA,L]
+RewriteRule ^ src/index.php [QSA,L]

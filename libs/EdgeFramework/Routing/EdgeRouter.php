@@ -1,11 +1,28 @@
 <?php
 namespace EdgeFramework\Routing;
 
+use EdgeFramework\Foundation\OutputInstrument;
+use EdgeFramework\Routing\Configurations\RouterConfiguration;
+use EdgeFramework\Routing\Enums\OutputKind;
 use EdgeFramework\View\Element;
 use EdgeFramework\View\Node;
 use EdgeFramework\View\Renderer;
 use EdgeFramework\View\Text;
-use RouterModuleManager;
+
+use EdgeFramework\Output\BufferedOutputInstrument;
+use EdgeFramework\Output\StreamingOutputInstrument;
+use LogicException;
+
+function getOutputInstrument(OutputKind $outputKind): OutputInstrument {
+    switch($outputKind){
+        case OutputKind::Buffered:
+            return new BufferedOutputInstrument();
+        case OutputKind::Streamed:
+            return new StreamingOutputInstrument();
+    }
+    
+    throw new LogicException((string) $outputKind ." is not a valid output kind.");
+}
 
 class EdgeRouter {
         /**
@@ -15,13 +32,14 @@ class EdgeRouter {
 
     public ?string $_base;
 
-    public function __construct(string $projectDir){
+    public RouterConfiguration $config;
+
+    public function __construct(RouterConfiguration $config){
         $this->_routes = [];
         
         // edge router wamp compat.
         // project router.
-        $base = basename($projectDir);
-        $this->_base = '/' . $base;
+        $this->config = $config;
     }
 
     public function addRoute(Route $route): void {
@@ -53,7 +71,6 @@ class EdgeRouter {
     }
 
     public function getQueryParams(string $method): array {
-        // Example: parse query params from $_GET or $_POST
         if (strtoupper($method) === 'POST') {
             return $_POST ?? [];
         }
@@ -65,8 +82,9 @@ class EdgeRouter {
         $parsedUrl = parse_url($uri, PHP_URL_PATH);
         $routePath = $parsedUrl ??'/';
         // strip the base url.
-        if (strpos($routePath, $this->_base) === 0){
-            return substr($routePath, strlen($this->_base));
+        $base = '/' . $this->config->projectName;
+        if (strpos($routePath, $base) === 0){
+            return substr($routePath, strlen($base));
         }
 
         return $routePath;
@@ -87,7 +105,7 @@ class EdgeRouter {
         $body = $routeResult->getBody();
     }
 
-    public function buildTemplateResponse(EdgeContext $context, Node $body){
+    public function applyViewResult(EdgeContext $context, Node $body){
         $title = new Element('title', null, [new Text($context->title)]);
 
         $metaElements = [];
@@ -116,11 +134,8 @@ class EdgeRouter {
             ])
         ]);
 
-        $renderer = new Renderer();
-        $html = $renderer->render($document);
-        $responseBody = "<!DOCTYPE html>\n\n$html";
-
-        return $responseBody;
+        $renderer = new Renderer(getOutputInstrument($this->config->outputKind));
+        $renderer->render($document);
     }
 
     public function applyRouteResult(EdgeContext $context, array $headers, RouteResult $routeResult): void {
@@ -136,8 +151,9 @@ class EdgeRouter {
         $body = $routeResult->getBody();
 
         if ($body instanceof Node){
-            echo $this->buildTemplateResponse($context, $body);
+            $this->applyViewResult($context, $body);
         }
+
         else {
             echo $body;
         }

@@ -3,15 +3,25 @@ namespace EdgeFramework\View;
 
 require_once __DIR__ . '/Node.php';
 use DocumentSpec;
+use EdgeFramework\Foundation\OutputInstrument;
 use EdgeFramework\View\voidTags;
 
 class Renderer
 {
+    private OutputInstrument $outputInstrument;
+
+    public function __construct(OutputInstrument $outputInstrument) {
+        $this->outputInstrument = $outputInstrument;
+    }
+
     public function render(Node $root)
     {
         $spec = new DocumentSpec();
         // result html.
-        $html = '';
+        // $html = '';
+        $write = function($data) use ($this) {
+            $this->outputInstrument->write($data);
+        };
 
         // the current node. (react style.)
         $currentNode = $root;
@@ -20,9 +30,12 @@ class Renderer
         // no more to process.
         while ($currentNode !== null) {
             if ($currentNode instanceof Element && isset($spec->voidTags[$currentNode->tag])) {
-                $html .= $this->htmlElementVoidTag($currentNode);
+                $write(
+                    $this->htmlElementVoidTag($currentNode)
+                );
+
                 $bubbleResult = $this->climbUpAndGatherClosingTags($currentNode);
-                $html .= $bubbleResult[1];
+                $write($bubbleResult[1]);
                 $currentNode = $bubbleResult[0];
                 continue;
             }
@@ -30,23 +43,20 @@ class Renderer
             // no child, meaning to stop descending and
             // actually go up. and apply closing tags.
             if ($currentNode->child === null) {
-                $html .= $this->htmlFromNodeWithoutChild($currentNode);
+                $write($this->htmlFromNodeWithoutChild($currentNode));
                 $bubbleResult = $this->climbUpAndGatherClosingTags($currentNode);
 
                 // append the closing tags collected while climbing up
-                $html .= $bubbleResult[1];
+                $write($bubbleResult[1]);
 
-                // set the current node to the next node to visit (returned by climbUp)
                 $currentNode = $bubbleResult[0];
                 continue;
             }
 
             // traverse the depths.
-            $html .= $this->htmlElementOpeningTag($currentNode);
+            $write($this->htmlElementOpeningTag($currentNode));
             $currentNode = $currentNode->child;
         }
-
-        return $html;
     }
 
     public function htmlElementOpeningTag(Element $element)
@@ -106,7 +116,7 @@ class Renderer
             return [$current->sibling, $closingTags];
         }
 
-        // Reached the topmost node; nothing more to traverse
+        // Reached the root node; nothing more to traverse.
         return [null, $closingTags];
     }
 

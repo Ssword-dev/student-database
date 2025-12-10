@@ -38,9 +38,3 @@ class RouteResult {
         return $this->_statusCode;
     }
 }
-
-class Ok extends RouteResult {
-    public function __construct(array $headers, mixed $body) {
-        parent::__construct($headers, $body, 200, 'OK');
-    }
-}
