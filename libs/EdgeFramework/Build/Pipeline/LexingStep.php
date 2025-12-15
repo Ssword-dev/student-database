@@ -56,191 +56,20 @@
 
 namespace EdgeFramework\Build\Pipeline;
 
+use EdgeFramework\Build\Lexer\Lexer;
+use EdgeFramework\Build\Scanner\Symbol;
 use EdgeFramework\Build\Tokenizer\RawToken;
 use EdgeFramework\Build\Lexer\SyntaxToken;
 
 
 /**
- * @extends parent<array<int,RawToken>,array<int,SyntaxToken>>
+ * @extends parent<\Generator<Symbol>>, Token[]>
  */
-final class LexingStep extends Step
+final class LexingStep implements Step
 {
-    public function process($rawTokens)
-    {
-        $syntaxTokens = [];
-        $rawTokenCount = count($rawTokens);
-        $currentIndex = 0;
-
-        // current token + move pointer back.
-        $prev = function () use ($rawTokens, &$currentIndex) {
-            return $rawTokens[$currentIndex--];
-        };
-
-        // current token + move pointer forward.
-        $next = function () use ($rawTokens, &$currentIndex) {
-            return $rawTokens[$currentIndex++];
-        };
-
-        $peekPrev = function ($offset = 1) use ($rawTokens, &$currentIndex) {
-            return $rawTokens[$currentIndex - $offset];
-        };
-
-        $peekNext = function ($offset = 1) use ($rawTokens, &$currentIndex) {
-            return $rawTokens[$currentIndex + $offset];
-        };
-
-        // current token.
-        $current = function () use ($rawTokens, &$currentIndex): ?RawToken {
-            return $rawTokens[$currentIndex];
-        };
-
-        // tests if current token matches a pattern.
-        $currentMatches = function (string $pattern) use ($current) {
-            return preg_match($pattern, $current());
-        };
-
-        // emits a syntax token.
-        $emit = function (string $type, array $tokens) use (&$syntaxTokens) {
-            $syntaxTokens[] = new SyntaxToken($type, $tokens);
-        };
-
-        $eof = function () use ($currentIndex, $rawTokenCount) {
-            return $currentIndex >= $rawTokenCount;
-        };
-
-        while (!$eof()) {
-            if ($current()->type === 'lcurly') {
-                // {{ ... }}
-                if ($peekNext()->type === 'lcurly') {
-                    $templateOpenTokens = [
-                        $next(), // {
-                        $next(), // {
-                    ];
-
-                    $templateContentTokens = [];
-
-                    while (!($current()->type === 'rcurly' && $peekNext()->type === 'rcurly')) {
-                        $templateContentTokens[] = $next();
-                    }
-
-                    $templateCloseTokens = [
-                        $next(), // }
-                        $next(), // }
-                    ];
-
-                    $emit('templateOpen', $templateOpenTokens);
-                    $emit('templateContent', $templateContentTokens);
-                    $emit('templateClose', $templateCloseTokens);
-                } else if ($peekNext()->type === 'exclaimation' && $peekNext(2)->type === 'exclaimation') {
-                    $templateOpenTokens = [
-                        $next(), // {
-                        $next(), // !
-                        $next(), // !
-                    ];
-
-                    $templateContentTokens = [];
-
-                    while (!($current()->type === 'exclaimation' && $peekNext()->type === 'exclaimation' && $peekNext(2)->type === 'rcurly')) {
-                        $templateOpenTokens[] = $next();
-                    }
-
-                    $templateCloseTokens = [
-                        $next(), // ! 
-                        $next(), // !
-                        $next(), // }
-                    ];
-
-                    $emit('rawTemplateOpen', $templateOpenTokens);
-                    $emit('rawTemplateContent', $templateCloseTokens);
-                    $emit('rawTemplateClose', $templateCloseTokens);
-                }
-            }
-
-            // <
-            elseif ($current()->type === 'lt') {
-                // allow whitespaces.
-                $startTagOpen = $next();
-                $tagName = null;
-
-                if ($current()->type === 'word') {
-                    $tagName = $next(); // tag
-                } else if (
-                    $current()->type === 'whitespace' &&
-                    $peekNext()->type === 'word'
-                ) {
-                    $next(); // whitespace
-                    $tagName = $next();   // tag
-                } else {
-                    // probably throw about malformed elements.
-                }
-
-                // the attributes
-                $attributeTokens = [];
-
-                while ($current()->type === 'word' || $current()->type === 'whitespace') {
-                    if ($current()->type === 'whitespace') {
-                        $next();
-                    }
-
-                    // TODO: validate this is actually a
-                    // word.
-                    $name = $next();
-
-                    while ($current()->type === 'whitespace') {
-                        $next();
-                    }
-
-                    // TODO: validate this is actually =
-                    $equalToken = $next();
-
-                    // TODO: validate this is actually a quote, else. raise error,
-                    $quoteToken = $next();
-
-                    if ($quoteToken->value === '"' || $quoteToken->value === '\'') {
-                        $attributeInnerValueTokens = [];
-
-                        while (true) {
-                            // \' and \" are escape sequences.
-                            if ($current()->value === $quoteToken && $peekPrev(1)->value === '\\')
-                                break;
-                            $attributeInnerValueTokens[] = $current()->value;
-                        }
-
-                        $endQuoteToken = $next();
-
-                        // attr="..." is done lexing.
-                        $attributeTokens[] = [$name, $quoteToken];
-                    }
-
-                    // we can parse a self closing, or a normal opening tag.
-                    // we can find out which by checking for the presence of /
-                    if ($current()->type === 'whitespace') {
-                        $next(); // consume space.
-                    }
-
-                    if ($current()->value === '/') {
-                        // self closing.
-                        $slashToken = $next();
-                        $gtToken = $next();
-
-                        $emit('selfCloseTagStart', [$startTagOpen]);
-                        $emit('tagName', [$tagName]);
-                        $emit('attributes', $attributeTokens);
-                        $emit('selfCloseTagEnd', [$slashToken, $gtToken]);
-                    } else if ($current()->value === '>') {
-                        $gtToken = $next();
-
-                        $emit('openingTagStart', [$startTagOpen]);
-                        $emit('tagName', [$tagName]);
-                        $emit('attributes', $attributeTokens);
-                        $emit('openingTagEnd', [$gtToken]);
-                    } else {
-                        // TODO: Complain here.
-                    }
-                }
-            }
-        }
-
-        return $syntaxTokens;
-    }
+  public function process($rawTokens)
+  {
+    $lexer = new Lexer();
+    return $lexer->tokenize($rawTokens);
+  }
 }

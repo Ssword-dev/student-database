@@ -1,16 +1,14 @@
-<?php
-
-namespace EdgeFramework\Build\Pipeline;
+<?php namespace EdgeFramework\Build\Pipeline;
 
 /**
  * @template I Step input.
  * @template O Step Output.
  */
-abstract class Step {
+interface Step {
     /**
      * Processes the previous step's output or the initial input.
      * @param I $input
      * @return O
      */
-    abstract public function process(mixed $input);
+    public function process($input);
 }

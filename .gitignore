@@ -1,3 +1,4 @@
 /vendor/
 /.yarn/*
 !/.yarn/sdks
+/tmp/

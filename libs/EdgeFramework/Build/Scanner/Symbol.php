@@ -1,11 +1,10 @@
 <?php
-namespace EdgeFramework\Build\Tokenizer;
+namespace EdgeFramework\Build\Scanner;
 
-class RawToken
+class Symbol
 {
     public string $type;
     public string $value;  // actual text
-
     public function __construct(string $type, string $value)
     {
         $this->type = $type;
