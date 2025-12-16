@@ -21,7 +21,8 @@ use function EdgeFramework\View\IntrinsicElements\{
     a
 };
 
-function WebsiteHeader(){
+function WebsiteHeader()
+{
     return header(
         ['class' => 'w-full h-64'],
         div(
@@ -36,7 +37,7 @@ function Page()
         [
             'id' => 'home-page',
             'class' =>
-            'min-h-screen flex flex-col font-sans ' .
+                'min-h-screen flex flex-col font-sans ' .
                 'bg-background'
         ],
 
@@ -66,7 +67,7 @@ function Page()
                     a([
                         'href' => '/students',
                         'class' =>
-                        'px-6 py-3 rounded-md text-white bg-indigo-500 ' .
+                            'px-6 py-3 rounded-md text-white bg-indigo-500 ' .
                             'hover:bg-indigo-600 transition transform ' .
                             'hover:-translate-y-1 shadow'
                     ], new Text('View Students')),
@@ -74,7 +75,7 @@ function Page()
                     a([
                         'href' => '/add-student',
                         'class' =>
-                        'px-6 py-3 rounded-md text-white bg-indigo-500 ' .
+                            'px-6 py-3 rounded-md text-white bg-indigo-500 ' .
                             'hover:bg-indigo-600 transition transform ' .
                             'hover:-translate-y-1 shadow'
                     ], new Text('Add New Student')),
@@ -82,7 +83,7 @@ function Page()
                     a([
                         'href' => '/settings',
                         'class' =>
-                        'px-6 py-3 rounded-md border-2 border-indigo-500 ' .
+                            'px-6 py-3 rounded-md border-2 border-indigo-500 ' .
                             'text-muted bg-gray-100 hover:bg-indigo-500 hover:text-white ' .
                             'transition transform hover:-translate-y-1'
                     ], new Text('Settings'))

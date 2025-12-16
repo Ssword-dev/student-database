@@ -1,12 +1,19 @@
 {
   "name": "student-database",
   "scripts": {
-    "tww": "tailwindcss -i tailwind.source.css -o static/css/tailwind.css --watch"
+    "tww": "tailwindcss -i tailwind.source.css -o static/css/tailwind.css --watch",
+    "build:icon": "yarn node ./scripts/icon-gen.mjs"
   },
   "packageManager": "yarn@4.6.0",
   "devDependencies": {
+    "@puppeteer/browsers": "^2.11.0",
     "@tailwindcss/cli": "^4.1.17",
     "autocannon": "^8.0.0",
-    "tailwindcss": "^4.1.17"
+    "eslint": "^9.39.2",
+    "favicons": "^7.2.0",
+    "prettier": "^3.7.4",
+    "pwa-asset-generator": "^8.1.2",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3"
   }
 }

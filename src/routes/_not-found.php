@@ -1,46 +1,23 @@
-<?php
+<!DOCTYPE html>
+<html lang="en">
 
-use EdgeFramework\Routing\EdgeContext;
-use EdgeFramework\Routing\MatchResult;
-use EdgeFramework\Routing\Route;
-use EdgeFramework\Routing\RouteResult;
-use EdgeFramework\View\Text;
-use function EdgeFramework\View\IntrinsicElements\{
-    div,
-    h1,
-    main
-};
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./static/js/jquery.js"></script>
+    <script src="./static/js/shared.js" type="module"></script>
+    <script src="./static/js/home.js" type="module"></script>
+</head>
 
-function NotFoundPage()
-{
-    return div(
-        [
-            'class' => 'flex flex-col justify-center align-center h-screen w-screen'
-        ],
-        main(
-            [],
-            h1(['class' => 'text-3xl'], new Text('The page you are looking for does not exist.'))
-        )
-    );
-}
+<body>
+    <div class="flex flex-col justify-center align-center h-screen w-screen">
+        <main>
+            <h1 class="text-3xl">
+                The page you are looking for does not exist.
+            </h1>
+        </main>
+    </div>
+</body>
 
-class NotFoundRoute extends Route
-{
-    public function match(string $routePath): MatchResult
-    {
-        return MatchResult::createBuilder()
-            ->withMatchState(true)
-            ->build();
-    }
-
-    public function get(EdgeContext $context, MatchResult $matchResult, array $query): RouteResult
-    {
-        $context->style('/student-database/static/css/shared.css');
-        return new RouteResult([], NotFoundPage(), 404, 'Not Found');
-    }
-
-    public function post(EdgeContext $context, MatchResult $matchResult, array $query): RouteResult
-    {
-        return $this->get($context, $matchResult, $query);
-    }
-}
+</html>
